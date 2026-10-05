@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>Điểm danh học sinh</title>
+
+<style>
+
+* {
+  box-sizing:border-box;
+}
+
+body {
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#eef5ff;
+  color:#102a43;
+}
+
+.container {
+  max-width:520px;
+  margin:auto;
+  padding:20px;
+  text-align:center;
+}
+
+.logo {
+  font-size:50px;
+  margin-top:10px;
+}
+
+h1 {
+  font-size:25px;
+  margin-bottom:5px;
+}
+
+.subtitle {
+  color:#64748b;
+  margin-bottom:20px;
+}
+
+#reader {
+  width:100%;
+  background:white;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 8px 30px rgba(0,0,0,.12);
+}
+
+button {
+  width:100%;
+  margin-top:20px;
+  padding:16px;
+  background:#2563eb;
+  color:white;
+  border:none;
+  border-radius:14px;
+  font-size:18px;
+  font-weight:bold;
+}
+
+.status {
+  margin-top:15px;
+  min-height:30px;
+  font-size:16px;
+}
+
+.note {
+  margin-top:20px;
+  font-size:13px;
+  color:#64748b;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="logo">
+📷
+</div>
+
+<h1>
+ĐIỂM DANH HỌC SINH
+</h1>
+
+<div class="subtitle">
+Quét mã QR trên thẻ học sinh
+</div>
+
+<div id="reader"></div>
+
+<button
+  id="startButton"
+  onclick="startScanner()">
+
+MỞ CAMERA QUÉT QR
+
+</button>
+
+<div
+  class="status"
+  id="status">
+
+Nhấn nút để bắt đầu quét.
+
+</div>
+
+<div class="note">
+
+Đưa mã QR vào chính giữa khung camera.
+
+</div>
+
+</div>
+
+<script
+src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js">
+</script>
+
+<script>
+
+const APPS_SCRIPT_URL =
+  "DAN_URL_APPS_SCRIPT_VAO_DAY";
+
+let scanner = null;
+
+let daQuet = false;
+
+async function startScanner() {
+
+  document
+    .getElementById("startButton")
+    .style.display = "none";
+
+  document
+    .getElementById("status")
+    .innerText =
+    "Đang mở camera...";
+
+  scanner =
+    new Html5Qrcode("reader");
+
+  try {
+
+    await scanner.start(
+
+      {
+        facingMode:"environment"
+      },
+
+      {
+        fps:10,
+
+        qrbox:{
+          width:250,
+          height:250
+        }
+      },
+
+      onScanSuccess,
+
+      function(error) {
+      }
+
+    );
+
+    document
+      .getElementById("status")
+      .innerText =
+      "Camera đã sẵn sàng.";
+
+  }
+
+  catch(err) {
+
+    document
+      .getElementById("status")
+      .innerHTML =
+      "Không mở được camera.<br>" +
+      err;
+
+    document
+      .getElementById("startButton")
+      .style.display = "block";
+  }
+}
+
+function onScanSuccess(decodedText) {
+
+  if (daQuet) return;
+
+  daQuet = true;
+
+  const token =
+    String(decodedText || "")
+      .trim();
+
+  if (!token) {
+
+    daQuet = false;
+
+    return;
+  }
+
+  document
+    .getElementById("status")
+    .innerText =
+    "Đã nhận mã. Đang điểm danh...";
+
+  window.location.href =
+    APPS_SCRIPT_URL +
+    "?token=" +
+    encodeURIComponent(token);
+}
+
+</script>
+
+</body>
+
+</html>
